@@ -1,0 +1,32 @@
+version: '3.8' # Указываем версию для совместимости и современных функций
+
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000' # HTTP-сервер
+      - '6000:6000' # WebSocket-сервер
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/message_app # Монтируем код для разработки
+    restart: unless-stopped # Перезапуск при сбоях, кроме явной остановки
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - '27017:27017' # Публикуем порт для Compass
+    volumes:
+      - mongo_data:/data/db # Сохраняем данные MongoDB
+    restart: unless-stopped # Перезапуск при сбоях
+    networks:
+      - app-network
+
+networks:
+  app-network: # Явно задаем сеть для сервисов
+    driver: bridge
+
+volumes:
+  mongo_data: # Именованный том для данных MongoDB
